@@ -18,11 +18,11 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("🔄 Начинаем создание таблиц...-----------------------"
+    print("🔄 Начинаем создание таблицы users...-----------------------"
     "-------------------------------------------------------------------------------------", file=sys.stderr)
     try:
         await create_tables()
-        print("✅ Таблицы созданы/проверены", file=sys.stderr)
+        print("✅ Таблица users созданы/проверены", file=sys.stderr)
     except Exception as e:
         print(f"❌ Ошибка при создании таблиц: {e}", file=sys.stderr)
     yield

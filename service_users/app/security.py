@@ -2,7 +2,6 @@ from fastapi import HTTPException
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
-from config import settings
 import os
 # Настраиваем контекст для хеширования паролей
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")

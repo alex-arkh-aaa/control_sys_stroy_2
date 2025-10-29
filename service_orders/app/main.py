@@ -11,14 +11,29 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
 from fastapi.responses import HTMLResponse
+import sys
 
-
+import logging
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await create_tables()
-    print("✅ Таблицы созданы/проверены")
+    print("🔄 Начинаем создание таблицы orders...-----------------------"
+    "-------------------------------------------------------------------------------------", file=sys.stderr)
+    try:
+        await create_tables()
+        print("✅ Таблица orders созданы/проверены", file=sys.stderr)
+    except Exception as e:
+        print(f"❌ Ошибка при создании таблиц: {e}", file=sys.stderr)
     yield
+
+
+
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     await create_tables()
+#     print("✅ Таблицы созданы/проверены")
+#     yield
 
 
 
