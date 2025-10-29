@@ -1,13 +1,11 @@
-# docker-compose.yml
 version: '3.8'  # Версия формата docker-compose
 
-# Сервисы (контейнеры) которые будем запускать
 services:
   # 🗄️ База данных PostgreSQL
   postgres:
-    image: postgres:16  # Готовый образ PostgreSQL 16 версии
+    image: postgres:17  # Готовый образ PostgreSQL 13 версии
     environment:        # Переменные окружения для настройки БД
-      POSTGRES_DB: task_management     # Название основной БД
+      POSTGRES_DB: control_sys_2     # Название основной БД
       POSTGRES_USER: admin             # Логин администратора
       POSTGRES_PASSWORD: password      # Пароль (ИЗМЕНИ В ПРОДАКШЕНЕ!)
     ports:
