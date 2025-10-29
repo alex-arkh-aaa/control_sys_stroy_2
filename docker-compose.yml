@@ -1,67 +1,56 @@
-version: '3.8'  # Версия формата docker-compose
+version: '3.8'
 
 services:
-  # 🗄️ База данных PostgreSQL
   postgres:
-    image: postgres:17  # Готовый образ PostgreSQL 13 версии
-    environment:        # Переменные окружения для настройки БД
-      POSTGRES_DB: control_sys_2     # Название основной БД
-      POSTGRES_USER: admin             # Логин администратора
-      POSTGRES_PASSWORD: password      # Пароль (ИЗМЕНИ В ПРОДАКШЕНЕ!)
+    image: postgres:13
+    environment:
+      POSTGRES_DB: control_sys_2
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
     ports:
-      - "5432:5432"  # Пробрасываем порт 5432 наружу для доступа извне
+      - "5433:5432"
     volumes:
-      # Постоянное хранилище для данных БД (чтобы не терялись при перезапуске)
       - postgres_data:/var/lib/postgresql/data
-      # SQL скрипт для инициализации (создаст отдельные БД для сервисов)
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
 
-  # 🚪 API Gateway - единая точка входа
   api_gateway:
-    build: ./api_gateway  # Собираем образ из папки api_gateway
+    build: ./api_gateway
     ports:
-      - "8000:8000"  # Открываем порт 8000 наружу - основной вход в систему
+      - "8000:8000"
     environment:
-      - ENVIRONMENT=development  # Режим разработки
-      - JWT_SECRET=your-secret-key-change-in-production  # Секрет для JWT
+      - ENVIRONMENT=development
+      - JWT_SECRET=your-secret-key-change-in-production
     volumes:
-      # Монтируем код для hot reload (изменения в коде сразу применяются)
-      - ./api_gateway:/app
+      - ./api_gateway:/app  # 👈 Оставляем как у тебя
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
-      # Запускается только после готовности сервисов
       - service_users
       - service_orders
 
-  # 👥 Сервис пользователей
   service_users:
     build: ./service_users
     environment:
-      # URL для подключения к БД (postgres - имя сервиса из этого compose файла)
-      - DATABASE_URL=postgresql://admin:password@postgres:5432/users_db
+      - DATABASE_URL=postgresql+asyncpg://admin:password@postgres:5432/users_db  # 👈 ДЛЯ DOCKER
       - JWT_SECRET=your-secret-key-change-in-production
       - JWT_ALGORITHM=HS256
     volumes:
-      - ./service_users:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    depends_on:
-      - postgres  # Ждем пока БД запустится
-
-  # 📦 Сервис заказов  
-  service_orders:
-    build: ./service_orders
-    environment:
-      - DATABASE_URL=postgresql://admin:password@postgres:5432/orders_db
-      - JWT_SECRET=your-secret-key-change-in-production
-      # URL сервиса пользователей для проверки существования пользователей
-      - USERS_SERVICE_URL=http://service_users:8000
-    volumes:
-      - ./service_orders:/app
+      - ./service_users:/app  # 👈 Оставляем как у тебя
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - postgres
-      - service_users  # Ждем пока сервис пользователей запустится
 
-# 📀 Volume для постоянного хранения данных БД
+  service_orders:
+    build: ./service_orders
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://admin:password@postgres:5432/orders_db  # 👈 ДЛЯ DOCKER
+      - JWT_SECRET=your-secret-key-change-in-production
+      - USERS_SERVICE_URL=http://service_users:8000
+    volumes:
+      - ./service_orders:/app  # 👈 Оставляем как у тебя
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - postgres
+      - service_users
+
 volumes:
-  postgres_data:  # Именованный volume для данных PostgreSQL
+  postgres_data:

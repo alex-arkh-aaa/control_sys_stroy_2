@@ -6,7 +6,7 @@ from .schemas import *
 from contextlib import asynccontextmanager
 from .security import *
 from sqlalchemy import select
-
+from .models import *
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
@@ -14,10 +14,17 @@ from fastapi.responses import HTMLResponse
 
 
 
+import logging
+logger = logging.getLogger(__name__)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await create_tables()
-    print("✅ Таблицы созданы/проверены")
+    logger.info("🔄 Начинаем создание таблиц...------------------------------------------------------------------------------------------------------------")
+    try:
+        await create_tables()
+        logger.info("✅ Таблицы созданы/проверены")
+    except Exception as e:
+        logger.error(f"❌ Ошибка при создании таблиц: {e}")
     yield
 
 

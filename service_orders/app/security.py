@@ -65,7 +65,7 @@ def check_edit_defect_permission(current_user, defect):
         detail="Нет прав для редактирования этого дефекта"
     )
 
-async def check_order_access(db, pщк_id: int, current_user):
+async def check_order_access(db, order_id: int, current_user):
     """Проверяет доступ пользователя к проекту"""
     from . import crud
     project = await crud.get_order(db, order_id)
