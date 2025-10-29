@@ -1,9 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from config import settings
-
+#from config import settings
+import os
 # Создаём асинхронный движок SQLAlchemy
-engine = create_async_engine(settings.DATABASE_URL)
+engine = create_async_engine(os.getenv('DATABASE_URL'))
 
 # Создаём фабрику асинхронных сессий
 AsyncSessionLocal = sessionmaker(

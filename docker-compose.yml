@@ -31,8 +31,9 @@ services:
     build: ./service_users
     environment:
       - DATABASE_URL=postgresql+asyncpg://admin:password@postgres:5432/users_db  # 👈 ДЛЯ DOCKER
-      - JWT_SECRET=your-secret-key-change-in-production
+      - JWT_SECRET_KEY=MxgmM26gBQqYdI9Bj3TGbSczW3Fyx2Odw21dp9Hy8aI
       - JWT_ALGORITHM=HS256
+      - ACC_TOKEN_EXP_MIN=60
     volumes:
       - ./service_users:/app  # 👈 Оставляем как у тебя
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
