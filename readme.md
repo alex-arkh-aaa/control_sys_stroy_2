@@ -6,7 +6,7 @@ docker-compose up --build
 psql -U admin -d users_db
 
 Другие команды:
-\d
+\d table_name
 \dt
 \c orders_db
 \l
