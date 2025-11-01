@@ -20,7 +20,7 @@ def get_password_hash(password):
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-def create_access_token(data: dict, expires_delta = os.getenv('ACC_TOKEN_EXP_MIN')):
+def create_access_token(data: dict, expires_delta = int(os.getenv('ACC_TOKEN_EXP_MIN'))):
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(minutes=expires_delta)
     to_encode.update({"exp": expire})  # Добавляем время истечения

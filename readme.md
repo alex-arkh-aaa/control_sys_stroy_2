@@ -11,6 +11,9 @@ psql -U admin -d users_db
 \c orders_db
 \l
 
+\x auto
++ select * from users;
+
 
 
 Браузер

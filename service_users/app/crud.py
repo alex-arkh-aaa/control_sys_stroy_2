@@ -5,7 +5,7 @@ from .models import *
 
 
 async def create_user(db: AsyncSession, name: str, email: str, hashed_password: str, role: str):
-    user = User(name=name, email=email, hashed_password=hashed_password, role=role)
+    user = User(full_name=name, email=email, password_hash=hashed_password, role=role)
     db.add(user)
     await db.commit()
     await db.refresh(user)

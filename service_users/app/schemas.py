@@ -25,14 +25,13 @@ class UserLogin(BaseModel):
 class UserResponse(BaseModel):
     id: UUID
     email: str
-    first_name: str
-    last_name: str
-    roles: str
+    full_name: str
+    role: str
     created_at: datetime
     updated_at: datetime
 
-class TokenResponse(BaseModel):
-    access_token: str
+class LoginResponse(BaseModel):
+    message: str
     token_type: str
 
 class MessageResponse(BaseModel):
