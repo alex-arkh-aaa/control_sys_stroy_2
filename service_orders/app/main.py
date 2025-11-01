@@ -40,3 +40,5 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 templates = Jinja2Templates(directory="app/templates")
+
+
