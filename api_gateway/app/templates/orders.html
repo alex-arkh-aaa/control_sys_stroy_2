@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои заказы - Control System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); padding: 30px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo h1 { color: #333; font-size: 32px; font-weight: 600; margin-bottom: 5px; }
+        .logo p { color: #666; font-size: 16px; }
+        .page-actions { display: flex; gap: 15px; }
+        .btn { padding: 12px 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3); }
+        .btn-secondary { background: #6c757d; }
+        .orders-container { background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); padding: 40px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .section-title { color: #333; font-size: 24px; font-weight: 600; }
+        .orders-grid { display: grid; gap: 20px; }
+        .order-card { background: #f8f9fa; border-radius: 10px; padding: 25px; border-left: 4px solid #667eea; transition: all 0.3s ease; }
+        .order-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
+        .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .order-id { color: #666; font-size: 14px; font-family: monospace; }
+        .order-status { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+        .status-created { background: #e3f2fd; color: #1976d2; }
+        .status-in_progress { background: #fff3e0; color: #f57c00; }
+        .status-completed { background: #e8f5e8; color: #2e7d32; }
+        .status-cancelled { background: #ffebee; color: #c62828; }
+        .order-items { margin-bottom: 15px; }
+        .order-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e1e5e9; }
+        .item-name { color: #333; font-weight: 500; }
+        .item-quantity { color: #666; }
+        .order-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e1e5e9; }
+        .order-total { color: #333; font-size: 18px; font-weight: 600; }
+        .order-date { color: #666; font-size: 14px; }
+        .no-orders { text-align: center; padding: 60px 20px; color: #666; }
+        .no-orders h3 { font-size: 20px; margin-bottom: 10px; }
+        .error { background: #fee; border: 1px solid #fcc; color: #c33; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
+        .loading { text-align: center; padding: 40px; color: #666; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 15px; padding: 30px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e1e5e9; }
+        .modal-header h2 { color: #333; font-size: 20px; margin: 0; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+        .close-btn:hover { color: #333; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .order-item-input { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .order-item-input input { flex: 1; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 14px; }
+        .order-item-input input:focus { outline: none; border-color: #667eea; }
+        .remove-item { background: #dc3545; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .remove-item:hover { background: #c82333; }
+        .total-amount { background: #f8f9fa; font-weight: 600; font-size: 18px; color: #333; width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e1e5e9; }
+        .btn-outline { background: white; border: 2px solid #667eea; color: #667eea; }
+        .btn-outline:hover { background: #667eea; color: white; }
+        .success-message { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; }
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 20px; text-align: center; }
+            .page-actions { justify-content: center; }
+            .order-header, .order-footer { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .order-item-input { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <h1>Мои заказы</h1>
+                <p>Управление строительными заказами</p>
+            </div>
+            <div class="page-actions">
+                <a href="/profile" class="btn btn-secondary">👤 Профиль</a>
+                <button onclick="openCreateOrderModal()" class="btn">➕ Создать заказ</button>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error"></div>
+        <div id="successMessage" class="success-message"></div>
+
+        <div class="orders-container">
+            <div class="section-header">
+                <h2 class="section-title">📦 История заказов</h2>
+            </div>
+            <div id="ordersList" class="orders-grid">
+                <div class="loading">Загрузка заказов...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания заказа -->
+    <div id="createOrderModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Создать новый заказ</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            
+            <form id="createOrderForm">
+                <div class="form-group">
+                    <label>Товары в заказе:</label>
+                    <div id="orderItems"></div>
+                    <button type="button" class="btn btn-outline" onclick="addOrderItem()" style="margin-top: 10px;">
+                        ➕ Добавить товар
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label>Общая сумма:</label>
+                    <input type="number" id="totalAmount" readonly class="total-amount" value="0">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                    <button type="submit" class="btn">📦 Создать заказ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Загрузка заказов
+        async function loadOrders() {
+            try {
+                const response = await fetch('/api/v1/orders/');
+                if (response.ok) {
+                    const orders = await response.json();
+                    displayOrders(orders);
+                } else {
+                    showError('Ошибка загрузки заказов');
+                }
+            } catch (error) {
+                showError('Ошибка соединения с сервером');
+            }
+        }
+
+        function displayOrders(orders) {
+            const ordersList = document.getElementById('ordersList');
+            
+            if (!orders || orders.length === 0) {
+                ordersList.innerHTML = `
+                    <div class="no-orders">
+                        <h3>Заказов пока нет</h3>
+                        <p>Создайте ваш первый заказ</p>
+                        <button onclick="openCreateOrderModal()" class="btn" style="margin-top: 15px;">
+                            ➕ Создать первый заказ
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            ordersList.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-id">#${order.id?.slice(0, 8) || 'N/A'}</div>
+                        <div class="order-status status-${order.status || 'created'}">
+                            ${getStatusDisplayName(order.status)}
+                        </div>
+                    </div>
+                    
+                    <div class="order-items">
+                        ${(order.items || []).map(item => `
+                            <div class="order-item">
+                                <span class="item-name">${item.product || 'Неизвестный товар'}</span>
+                                <span class="item-quantity">${item.quantity || 0} шт. × ${item.price || 0} ₽</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="order-footer">
+                        <div class="order-total">${order.total_amount || 0} ₽</div>
+                        <div class="order-date">
+                            ${order.created_at ? new Date(order.created_at).toLocaleDateString('ru-RU') : 'Дата не указана'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusDisplayName(status) {
+            const statuses = {
+                'created': 'Создан',
+                'in_progress': 'В работе',
+                'completed': 'Завершён',
+                'cancelled': 'Отменён'
+            };
+            return statuses[status] || status || 'Создан';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => successDiv.style.display = 'none', 5000);
+        }
+
+        // Функции модального окна
+        function openCreateOrderModal() {
+            document.getElementById('createOrderModal').style.display = 'flex';
+            addOrderItem();
+        }
+
+        function closeModal() {
+            document.getElementById('createOrderModal').style.display = 'none';
+            document.getElementById('createOrderForm').reset();
+            document.getElementById('orderItems').innerHTML = '';
+            document.getElementById('totalAmount').value = '0';
+        }
+
+        function addOrderItem() {
+            const orderItems = document.getElementById('orderItems');
+            const itemId = Date.now();
+            
+            const itemHtml = `
+                <div class="order-item-input" id="item-${itemId}">
+                    <input type="text" placeholder="Название товара" class="item-product" oninput="calculateTotal()" required>
+                    <input type="number" placeholder="Кол-во" class="item-quantity" min="1" value="1" oninput="calculateTotal()" required>
+                    <input type="number" placeholder="Цена" class="item-price" min="0" value="0" oninput="calculateTotal()" required>
+                    <button type="button" class="remove-item" onclick="removeOrderItem('${itemId}')">×</button>
+                </div>
+            `;
+            
+            orderItems.insertAdjacentHTML('beforeend', itemHtml);
+            calculateTotal();
+        }
+
+        function removeOrderItem(itemId) {
+            const itemElement = document.getElementById('item-' + itemId);
+            if (itemElement) {
+                itemElement.remove();
+                calculateTotal();
+            }
+        }
+
+        function calculateTotal() {
+            const items = document.querySelectorAll('.order-item-input');
+            let total = 0;
+            
+            items.forEach(item => {
+                const quantity = parseInt(item.querySelector('.item-quantity').value) || 0;
+                const price = parseInt(item.querySelector('.item-price').value) || 0;
+                total += quantity * price;
+            });
+            
+            document.getElementById('totalAmount').value = total;
+        }
+
+        // Обработка формы создания заказа
+        document.getElementById('createOrderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const items = [];
+            const itemElements = document.querySelectorAll('.order-item-input');
+            
+            itemElements.forEach(item => {
+                const product = item.querySelector('.item-product').value.trim();
+                const quantity = parseInt(item.querySelector('.item-quantity').value);
+                const price = parseInt(item.querySelector('.item-price').value);
+                
+                if (product && quantity > 0 && price >= 0) {
+                    items.push({ product, quantity, price });
+                }
+            });
+            
+            if (items.length === 0) {
+                showError('Добавьте хотя бы один товар');
+                return;
+            }
+            
+            const totalAmount = parseInt(document.getElementById('totalAmount').value);
+            
+            try {
+                // Имитация успешного создания заказа
+                const newOrder = {
+                    id: 'order_' + Date.now(),
+                    status: 'created',
+                    items: items,
+                    total_amount: totalAmount,
+                    created_at: new Date().toISOString()
+                };
+
+                // В реальном приложении здесь был бы fetch запрос:
+                /*
+                const response = await fetch('/api/v1/orders/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items, total_amount: totalAmount })
+                });
+
+                if (response.ok) {
+                    const newOrder = await response.json();
+                */
+
+                // Добавляем новый заказ в список
+                const ordersList = document.getElementById('ordersList');
+                const noOrdersDiv = ordersList.querySelector('.no-orders');
+                
+                if (noOrdersDiv) {
+                    ordersList.innerHTML = '';
+                }
+                
+                ordersList.insertAdjacentHTML('afterbegin', `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-id">#${newOrder.id.slice(0, 8)}</div>
+                            <div class="order-status status-created">Создан</div>
+                        </div>
+                        <div class="order-items">
+                            ${newOrder.items.map(item => `
+                                <div class="order-item">
+                                    <span class="item-name">${item.product}</span>
+                                    <span class="item-quantity">${item.quantity} шт. × ${item.price} ₽</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="order-footer">
+                            <div class="order-total">${newOrder.total_amount} ₽</div>
+                            <div class="order-date">
+                                ${new Date(newOrder.created_at).toLocaleDateString('ru-RU')}
+                            </div>
+                        </div>
+                    </div>
+                `);
+
+                closeModal();
+                showSuccess('Заказ успешно создан!');
+                
+            } catch (error) {
+                showError('Ошибка при создании заказа: ' + error.message);
+            }
+        });
+
+        // Загружаем заказы при загрузке страницы
+        loadOrders();
+    </script>
+</body>
+</html>

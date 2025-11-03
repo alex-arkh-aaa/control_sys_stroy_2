@@ -1,72 +1,6 @@
-# from fastapi import FastAPI, Request, HTTPException
-# from fastapi.responses import JSONResponse
-# import httpx
-
-# import logging
-# logger = logging.getLogger(__name__)
-
-# app = FastAPI(title="API Gateway")
-
-# # Конфигурация сервисов
-# SERVICE_URLS = {
-#     "users": "http://service_users:8000",
-#     "orders": "http://service_orders:8000"
-# }
-
-# @app.get("/health")
-# async def root():
-#     return {"message": "API Gateway is running"}
-
-# # ✅ ДОБАВЬ ПРОКСИ ДЛЯ USERS
-# @app.api_route("/api/v1/users/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
-# async def proxy_users(request: Request, path: str):
-#     return await proxy_request("users", request, path)
-
-# # ✅ ДОБАВЬ ПРОКСИ ДЛЯ ORDERS
-# @app.api_route("/api/v1/orders/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
-# async def proxy_orders(request: Request, path: str):
-#     return await proxy_request("orders", request, path)
-
-# async def proxy_request(service: str, request: Request, path: str):
-#     # ИСПРАВЛЯЕМ - добавляем префикс сервиса к пути
-#     target_url = f"{SERVICE_URLS[service]}/api/v1/{service}/{path}"
-#     # Теперь для /api/v1/users/health → 
-#     # http://service_users:8000/api/v1/users/health ✅
-    
-#     # Прокидываем заголовки
-#     headers = {key: value for key, value in request.headers.items() 
-#                if key.lower() not in ['host', 'content-length']}
-    
-#     # Получаем тело запроса
-#     body = await request.body()
-    
-#     try:
-#         async with httpx.AsyncClient() as client:
-#             response = await client.request(
-#                 method=request.method,
-#                 url=target_url,
-#                 headers=headers,
-#                 content=body,
-#                 params=request.query_params
-#             )
-            
-#             return JSONResponse(
-#                 content=response.json(),
-#                 status_code=response.status_code,
-#                 headers=dict(response.headers)
-#             )
-            
-#     except httpx.ConnectError:
-#         logger.error(f"Cannot connect to {service} service")
-#         raise HTTPException(status_code=503, detail=f"Service {service} unavailable")
-#     except Exception as e:
-#         logger.error(f"Error proxying to {service}: {str(e)}")
-#         raise HTTPException(status_code=500, detail="Internal gateway error")
-
-
-
 from fastapi import FastAPI, Request, HTTPException, Response
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
 import httpx
 import logging
 from typing import Optional
@@ -76,6 +10,7 @@ import os
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="API Gateway")
+templates = Jinja2Templates(directory="app/templates")
 
 # Конфигурация сервисов
 SERVICE_URLS = {
@@ -91,19 +26,21 @@ async def auth_middleware(request: Request, call_next):
     # 1. Публичные пути (пропускаем без проверки JWT)
     public_paths = [
         '/', 
-        '/api/v1/users/login', '/api/v1/users/register', '/api/v1/users/health',
-        '/api/v1/orders/health'
+        '/login', '/register', '/api/v1/users/health',
+        '/api/v1/orders/health', '/api/v1/users/login',
+        '/api/v1/users/register'
     ]
 
+    logger.warning(request.url.path)
     if request.url.path in public_paths:
-        logger.warning(f"🟢 Public path: {request.url.path}")
+        # logger.warning(f"🟢 Public path: {request.url.path}")
         return await call_next(request)
     
     # 2. Для защищённых путей - проверяем JWT из cookie
     token = request.cookies.get("access_token")
     
     if not token:
-        logger.warning("❌ No token found")
+        # logger.warning("❌ No token found")
         # Нет токена - редирект на логин или 401
         if request.url.path.startswith('/api/'):
             return JSONResponse(status_code=401, content={"error": "Unauthorized"})
@@ -147,9 +84,25 @@ async def auth_middleware(request: Request, call_next):
 
 
 # ================== ПРОКСИРОВАНИЕ ==================
-@app.get("/")
-async def root():
-    return {"message": "API Gateway is running"}
+@app.get("/", response_class=HTMLResponse)
+async def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.get("/register", response_class=HTMLResponse)  
+async def register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
+
+@app.get("/profile", response_class=HTMLResponse)
+async def profile_page(request: Request):
+    return templates.TemplateResponse("profile.html", {"request": request})
+
+@app.get("/orders", response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse("orders.html", {"request": request})
 
 @app.api_route("/api/v1/users/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 async def proxy_users(request: Request, path: str):
