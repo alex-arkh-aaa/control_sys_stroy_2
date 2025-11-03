@@ -79,3 +79,27 @@ Service Orders: бизнес-логика (получает user_id из заг�
 
     DELETE /api/v1/orders/{order_id}
     Headers: X-User-ID: ...
+
+
+
+
+
+
+
+Тестирование сервисов в Postman:
+POST http://localhost:8000/api/v1/users/register
+Content-Type: application/json
+{
+  "email": "test@mail.com",
+  "password": "123456", 
+  "full_name": "Test User",
+  "role": "engineer"
+}
+
+
+POST http://localhost:8000/api/v1/users/login
+Content-Type: application/json
+{
+  "email": "test@mail.com",
+  "password": "123456"
+}

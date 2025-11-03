@@ -7,6 +7,7 @@ passlib[argon2]
 python-dotenv
 argon2-cffi
 asyncpg
+jose
 
 python-multipart
 pydantic-settings

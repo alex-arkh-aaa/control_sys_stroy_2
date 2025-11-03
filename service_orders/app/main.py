@@ -1,10 +1,9 @@
-from fastapi import FastAPI, Header, responses, Depends, HTTPException
+from fastapi import FastAPI, Header, responses, Depends, HTTPException, APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from .database import get_db, create_tables
 from . import crud
 from .schemas import *
 from contextlib import asynccontextmanager
-from .security import *
 from sqlalchemy import select
 from .models import Orders
 from fastapi.staticfiles import StaticFiles
@@ -27,18 +26,105 @@ async def lifespan(app: FastAPI):
         print(f"❌ Ошибка при создании таблиц: {e}", file=sys.stderr)
     yield
 
-
-
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     await create_tables()
-#     print("✅ Таблицы созданы/проверены")
-#     yield
-
-
-
 app = FastAPI(lifespan=lifespan)
+router = APIRouter(prefix="/api/v1/orders")
 
 templates = Jinja2Templates(directory="app/templates")
 
+@router.get("/health")
+async def health():
+    return {'message': 'service_orders successfully working!'}
 
+
+
+
+@router.get("/", response_model=list[OrderResponse])
+async def get_orders(
+    skip: int = 0,
+    limit: int = 100,
+    x_user_id: str = Header(...),  # 👈 user_id из API Gateway
+    db: AsyncSession = Depends(get_db)
+):
+    """Получить заказы текущего пользователя"""
+    user_id = UUID(x_user_id)
+    orders = await crud.get_user_orders(db, user_id, skip=skip, limit=limit)
+    return orders
+
+@router.post("/", response_model=OrderResponse)
+async def create_order(
+    order_data: OrderCreate,
+    x_user_id: str = Header(...),  # 👈 user_id из API Gateway
+    db: AsyncSession = Depends(get_db)
+):
+    """Создать новый заказ"""
+    user_id = UUID(x_user_id)
+    order = await crud.create_order(
+        db, 
+        user_id=user_id,
+        items=[item.dict() for item in order_data.items],
+        total_amount=order_data.total_amount
+    )
+    return order
+
+@router.get("/{order_id}", response_model=OrderResponse)
+async def get_order(
+    order_id: UUID,
+    x_user_id: str = Header(...),  # 👈 user_id из API Gateway
+    db: AsyncSession = Depends(get_db)
+):
+    """Получить заказ по ID"""
+    user_id = UUID(x_user_id)
+    order = await crud.get_order(db, order_id)
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    # Проверяем что заказ принадлежит пользователю
+    if order.user_id != user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    return order
+
+@router.put("/{order_id}", response_model=OrderResponse)
+async def update_order(
+    order_id: UUID,
+    order_update: OrderUpdate,
+    x_user_id: str = Header(...),  # 👈 user_id из API Gateway
+    db: AsyncSession = Depends(get_db)
+):
+    """Обновить статус заказа"""
+    user_id = UUID(x_user_id)
+    order = await crud.get_order(db, order_id)
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    if order.user_id != user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    updated_order = await crud.update_order_status(db, order_id, order_update.status)
+    return updated_order
+
+@router.delete("/{order_id}")
+async def delete_order(
+    order_id: UUID,
+    x_user_id: str = Header(...),  # 👈 user_id из API Gateway
+    db: AsyncSession = Depends(get_db)
+):
+    """Удалить заказ"""
+    user_id = UUID(x_user_id)
+    order = await crud.get_order(db, order_id)
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    if order.user_id != user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    await crud.delete_order(db, order_id)
+    return {"message": "Order deleted"}
+
+
+
+
+app.include_router(router)
