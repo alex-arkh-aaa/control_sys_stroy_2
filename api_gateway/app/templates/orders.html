@@ -18,14 +18,28 @@
         .btn-warning { background: #ffc107; color: #212529; }
         .btn-danger { background: #dc3545; color: white; }
         .btn-sm { padding: 8px 16px; font-size: 12px; }
+        .btn-outline { background: white; border: 2px solid #667eea; color: #667eea; }
+        .btn-outline:hover { background: #667eea; color: white; }
+        
         .orders-container { background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); padding: 40px; }
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .section-title { color: #333; font-size: 24px; font-weight: 600; }
-        .orders-grid { display: grid; gap: 20px; }
-        .order-card { background: #f8f9fa; border-radius: 10px; padding: 25px; border-left: 4px solid #667eea; transition: all 0.3s ease; position: relative; }
+        
+        /* Стили для поиска и фильтров */
+        .search-filters { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .search-box { flex: 1; min-width: 250px; }
+        .search-input { width: 100%; padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 14px; }
+        .search-input:focus { outline: none; border-color: #667eea; }
+        .filter-select { padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 14px; min-width: 180px; }
+        
+        /* Стили для скролла заказов */
+        .orders-scroll-container { max-height: 600px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #e1e5e9; border-radius: 10px; }
+        .orders-grid { display: grid; gap: 15px; padding: 20px; }
+        
+        .order-card { background: #f8f9fa; border-radius: 10px; padding: 20px; border-left: 4px solid #667eea; transition: all 0.3s ease; position: relative; }
         .order-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
         .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .order-id { color: #666; font-size: 14px; font-family: monospace; }
+        .order-id { color: #666; font-size: 14px; font-family: monospace; background: #fff; padding: 4px 8px; border-radius: 4px; }
         .order-status { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
         .status-created { background: #e3f2fd; color: #1976d2; }
         .status-in_progress { background: #fff3e0; color: #f57c00; }
@@ -39,10 +53,21 @@
         .order-total { color: #333; font-size: 18px; font-weight: 600; }
         .order-date { color: #666; font-size: 14px; }
         .order-actions { display: flex; gap: 10px; margin-top: 15px; }
+        
+        /* Пагинация */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 30px; }
+        .pagination-btn { padding: 8px 16px; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; margin-left: 3px;}
+        .pagination-btn:hover { background: #f8f9fa; border-color: #667eea; }
+        .pagination-btn.active { background: #667eea; color: white; border-color: #667eea; }
+        .pagination-btn:disabled { background: #f8f9fa; color: #999; cursor: not-allowed; }
+        .page-info { color: #666; font-size: 14px; }
+        
         .no-orders { text-align: center; padding: 60px 20px; color: #666; }
         .no-orders h3 { font-size: 20px; margin-bottom: 10px; }
         .error { background: #fee; border: 1px solid #fcc; color: #c33; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
         .loading { text-align: center; padding: 40px; color: #666; }
+        
+        /* Модальные окна */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; border-radius: 15px; padding: 30px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e1e5e9; }
@@ -58,16 +83,17 @@
         .remove-item:hover { background: #c82333; }
         .total-amount { background: #f8f9fa; font-weight: 600; font-size: 18px; color: #333; width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; }
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e1e5e9; }
-        .btn-outline { background: white; border: 2px solid #667eea; color: #667eea; }
-        .btn-outline:hover { background: #667eea; color: white; }
-        .success-message { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; }
         .status-select { width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 14px; margin-bottom: 15px; }
+        .success-message { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; }
+        
         @media (max-width: 768px) {
             .header { flex-direction: column; gap: 20px; text-align: center; }
             .page-actions { justify-content: center; }
+            .search-filters { flex-direction: column; }
             .order-header, .order-footer { flex-direction: column; align-items: flex-start; gap: 10px; }
             .order-item-input { flex-direction: column; }
             .order-actions { flex-direction: column; }
+            .pagination { flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -91,13 +117,51 @@
             <div class="section-header">
                 <h2 class="section-title">📦 История заказов</h2>
             </div>
-            <div id="ordersList" class="orders-grid">
-                <div class="loading">Загрузка заказов...</div>
+            
+            <!-- Поиск и фильтры -->
+            <div class="search-filters">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Поиск по ID заказа (например: #63bfc240)" class="search-input">
+                </div>
+                <select id="statusFilter" class="filter-select">
+                    <option value="">Все статусы</option>
+                    <option value="created">🆕 Создан</option>
+                    <option value="in_progress">🔄 В работе</option>
+                    <option value="completed">✅ Завершён</option>
+                    <option value="cancelled">❌ Отменён</option>
+                </select>
+                <select id="sortSelect" class="filter-select">
+                    <option value="newest">Сначала новые</option>
+                    <option value="oldest">Сначала старые</option>
+                    <option value="total_high">Сумма по убыванию</option>
+                    <option value="total_low">Сумма по возрастанию</option>
+                </select>
+                <button onclick="clearFilters()" class="btn btn-outline">🗑️ Сбросить</button>
+            </div>
+            
+            <!-- Контейнер со скроллом -->
+            <div class="orders-scroll-container">
+                <div id="ordersList" class="orders-grid">
+                    <div class="loading">Загрузка заказов...</div>
+                </div>
+            </div>
+            
+            <!-- Пагинация -->
+            <div class="pagination">
+                <button id="prevPage" class="pagination-btn" onclick="changePage(currentPage - 1)">← Назад</button>
+                
+                <div id="pageNumbers" class="pagination-numbers">
+                    <!-- Номера страниц будут генерироваться динамически -->
+                </div>
+                
+                <button id="nextPage" class="pagination-btn" onclick="changePage(currentPage + 1)">Вперёд →</button>
+                
+                <span class="page-info" id="pageInfo">Страница 1 из 1</span>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно создания заказа -->
+    <!-- Модальные окна (остаются без изменений) -->
     <div id="createOrderModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -127,7 +191,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно редактирования заказа -->
     <div id="editOrderModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -174,21 +237,76 @@
 
     <script>
         let currentOrders = [];
+        let currentPage = 1;
+        const ordersPerPage = 5;
+        let totalPages = 1;
+        let searchTerm = '';
+        let statusFilter = '';
+        let sortBy = 'newest';
 
         // Загрузка заказов
         async function loadOrders() {
             try {
+                showLoading(true);
                 const response = await fetch('/api/v1/orders/');
                 if (response.ok) {
                     const orders = await response.json();
                     currentOrders = orders;
-                    displayOrders(orders);
+                    applyFiltersAndDisplay();
                 } else {
                     showError('Ошибка загрузки заказов');
                 }
             } catch (error) {
                 showError('Ошибка соединения с сервером');
+            } finally {
+                showLoading(false);
             }
+        }
+
+        function applyFiltersAndDisplay() {
+            let filteredOrders = [...currentOrders];
+            
+            // Применяем поиск по ID
+            if (searchTerm) {
+                const searchTermClean = searchTerm.replace('#', '').toLowerCase();
+                filteredOrders = filteredOrders.filter(order => 
+                    order.id.toLowerCase().includes(searchTermClean)
+                );
+            }
+            
+            // Применяем фильтр по статусу
+            if (statusFilter) {
+                filteredOrders = filteredOrders.filter(order => 
+                    order.status === statusFilter
+                );
+            }
+            
+            // Применяем сортировку
+            filteredOrders.sort((a, b) => {
+                switch (sortBy) {
+                    case 'oldest':
+                        return new Date(a.created_at) - new Date(b.created_at);
+                    case 'total_high':
+                        return (b.total_amount || 0) - (a.total_amount || 0);
+                    case 'total_low':
+                        return (a.total_amount || 0) - (b.total_amount || 0);
+                    case 'newest':
+                    default:
+                        return new Date(b.created_at) - new Date(a.created_at);
+                }
+            });
+            
+            // Обновляем пагинацию
+            totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+            if (currentPage > totalPages) currentPage = 1;
+            
+            // Получаем заказы для текущей страницы
+            const startIndex = (currentPage - 1) * ordersPerPage;
+            const endIndex = startIndex + ordersPerPage;
+            const ordersToDisplay = filteredOrders.slice(startIndex, endIndex);
+            
+            displayOrders(ordersToDisplay);
+            updatePagination(filteredOrders.length);
         }
 
         function displayOrders(orders) {
@@ -197,8 +315,8 @@
             if (!orders || orders.length === 0) {
                 ordersList.innerHTML = `
                     <div class="no-orders">
-                        <h3>Заказов пока нет</h3>
-                        <p>Создайте ваш первый заказ</p>
+                        <h3>Заказов не найдено</h3>
+                        <p>Попробуйте изменить параметры поиска или создать новый заказ</p>
                         <button onclick="openCreateOrderModal()" class="btn" style="margin-top: 15px;">
                             ➕ Создать первый заказ
                         </button>
@@ -249,6 +367,48 @@
             `).join('');
         }
 
+        function updatePagination(totalOrders) {
+            const pageInfo = document.getElementById('pageInfo');
+            const prevBtn = document.getElementById('prevPage');
+            const nextBtn = document.getElementById('nextPage');
+            const pageNumbers = document.getElementById('pageNumbers');
+            
+            pageInfo.textContent = `Страница ${currentPage} из ${totalPages} (всего: ${totalOrders})`;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+            
+            // Генерируем номера страниц
+            let pagesHtml = '';
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                pagesHtml += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+            
+            pageNumbers.innerHTML = pagesHtml;
+        }
+
+        function changePage(page) {
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            applyFiltersAndDisplay();
+            // Прокручиваем к верху списка заказов
+            document.querySelector('.orders-scroll-container').scrollTop = 0;
+        }
+
+        function showLoading(show) {
+            const ordersList = document.getElementById('ordersList');
+            if (show) {
+                ordersList.innerHTML = '<div class="loading">Загрузка заказов...</div>';
+            }
+        }
+
         function getStatusDisplayName(status) {
             const statuses = {
                 'created': 'Создан',
@@ -273,7 +433,38 @@
             setTimeout(() => successDiv.style.display = 'none', 5000);
         }
 
-        // ========== ФУНКЦИИ СОЗДАНИЯ ЗАКАЗА ==========
+        // Обработчики поиска и фильтров
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            searchTerm = e.target.value;
+            currentPage = 1;
+            applyFiltersAndDisplay();
+        });
+
+        document.getElementById('statusFilter').addEventListener('change', function(e) {
+            statusFilter = e.target.value;
+            currentPage = 1;
+            applyFiltersAndDisplay();
+        });
+
+        document.getElementById('sortSelect').addEventListener('change', function(e) {
+            sortBy = e.target.value;
+            currentPage = 1;
+            applyFiltersAndDisplay();
+        });
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('sortSelect').value = 'newest';
+            searchTerm = '';
+            statusFilter = '';
+            sortBy = 'newest';
+            currentPage = 1;
+            applyFiltersAndDisplay();
+        }
+
+        // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (создание, редактирование заказов) ==========
+        // ... (все остальные функции из предыдущего кода остаются без изменений)
         function openCreateOrderModal() {
             document.getElementById('createOrderModal').style.display = 'flex';
             addOrderItem();
@@ -378,7 +569,7 @@
             }
         });
 
-        // ========== ФУНКЦИИ РЕДАКТИРОВАНИЯ ЗАКАЗА ==========
+        // Функции редактирования заказа
         function openEditOrderModal(orderId) {
             const order = currentOrders.find(o => o.id === orderId);
             if (!order) {
@@ -389,7 +580,6 @@
             document.getElementById('editOrderId').value = orderId;
             document.getElementById('editOrderStatus').value = order.status;
             
-            // Заполняем товары
             const editOrderItems = document.getElementById('editOrderItems');
             editOrderItems.innerHTML = '';
             
@@ -485,7 +675,6 @@
             const totalAmount = parseInt(document.getElementById('editTotalAmount').value);
             
             try {
-                // Обновляем статус
                 const statusResponse = await fetch(`/api/v1/orders/${orderId}`, {
                     method: 'PUT',
                     headers: { 

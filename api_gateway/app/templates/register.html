@@ -139,7 +139,7 @@
             display: none;
         }
 
-        .job-title-options {
+        .job-title {
             display: flex;
             flex-direction: column;
             gap: 5px;
@@ -252,22 +252,22 @@
 
             <div class="form-group">
                 <label>Должность *</label>
-                <select id="job_title" name="job_title" required>
+                <!-- <select id="job_title" name="job_title" required>
                     <option value="">Выберите должность</option>
                     <option value="engineer">Инженер</option>
                     <option value="manager">Менеджер</option>
                     <option value="seo">Руководитель</option>
-                </select>
+                </select> -->
                 
-                <div class="job-title-options">
+                <div class="job-title"> 
                     <div class="job-option" data-value="engineer">
-                        🛠️ Инженер - регистрация дефектов, обновление информации
+                        🛠️ Инженер
                     </div>
                     <div class="job-option" data-value="manager">
-                        📊 Менеджер - назначение задач, контроль сроков, отчёты
+                        📊 Менеджер
                     </div>
                     <div class="job-option" data-value="seo">
-                        👨‍💼 Руководитель - просмотр прогресса и аналитика
+                        👨‍💼 Руководитель
                     </div>
                 </div>
             </div>
@@ -288,9 +288,14 @@
                     opt.classList.remove('selected');
                 });
                 this.classList.add('selected');
-                document.getElementById('job_title').value = this.dataset.value;
             });
         });
+
+        // Функция для получения выбранной должности
+        function getSelectedJobTitle() {
+            const selectedOption = document.querySelector('.job-option.selected');
+            return selectedOption ? selectedOption.dataset.value : '';
+        }
 
         // Валидация совпадения паролей
         function validatePasswords() {
@@ -355,7 +360,7 @@
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value,
                 full_name: document.getElementById('name').value,
-                role: document.getElementById('job_title').value
+                role: getSelectedJobTitle() // Используем функцию для получения значения должности
             };
 
             // Валидация
