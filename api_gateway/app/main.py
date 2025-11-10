@@ -6,11 +6,16 @@ import logging
 from typing import Optional
 from jose import JWTError, jwt
 import os
+from fastapi.middleware.cors import CORSMiddleware
+from .rate_limiting import rate_limit_middleware
+
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="API Gateway")
 templates = Jinja2Templates(directory="app/templates")
+
+
 
 # Конфигурация сервисов
 SERVICE_URLS = {
@@ -18,11 +23,36 @@ SERVICE_URLS = {
     "orders": "http://service_orders:8000"
 }
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # React dev server
+        "http://127.0.0.1:3000", 
+        "http://localhost:8000",  # FastAPI itself
+        "http://127.0.0.1:8000",
+        "null"
+        # Добавь другие домены по необходимости
+    ],
+    allow_credentials=True,  # Разрешает cookies, authorization headers
+    allow_methods=["*"],     # Разрешает все методы: GET, POST, PUT, DELETE, etc.
+    allow_headers=["*"],     # Разрешает все заголовки
+)
+
+# Rate Limiting Middleware
+@app.middleware("http")
+async def add_rate_limiting(request: Request, call_next):
+    return await rate_limit_middleware(request, call_next)
+
 # ================== MIDDLEWARE ==================
 @app.middleware("http")
-async def auth_middleware(request: Request, call_next):
+async def auth_middleware(request: Request, call_next): 
     """Выполняется на КАЖДЫЙ запрос"""
     
+
+    # Пропускаем CORS preflight запросы (OPTIONS)
+    if request.method == "OPTIONS":
+        return await call_next(request)
     # 1. Публичные пути (пропускаем без проверки JWT)
     public_paths = [
         '/', 
