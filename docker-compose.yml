@@ -1,14 +1,14 @@
 version: '3.8'
 
 services:
-  postgres:
+  postgres:  # 👈 ДОБАВЬ ЭТУ СТРОКУ!
     image: postgres:17
     environment:
       POSTGRES_DB: control_sys_2
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -16,14 +16,13 @@ services:
   api_gateway:
     build: ./api_gateway
     ports:
-      - "8000:8000"
+      - "80:8000"
     environment:
-      - ENVIRONMENT=development
-      - JWT_SECRET_KEY=MxgmM26gBQqYdI9Bj3TGbSczW3Fyx2Odw21dp9Hy8aI
-      - JWT_ALGORITHM=HS256
-      - ACC_TOKEN_EXP_MIN=60
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - ACC_TOKEN_EXP_MIN=${ACC_TOKEN_EXP_MIN}
     volumes:
-      - ./api_gateway:/app  # 👈 Оставляем как у тебя
+      - ./api_gateway:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - service_users
@@ -32,14 +31,13 @@ services:
   service_users:
     build: ./service_users
     environment:
-      - DATABASE_URL=postgresql+asyncpg://admin:password@postgres:5432/users_db  # 👈 ДЛЯ DOCKER
-      - JWT_SECRET_KEY=MxgmM26gBQqYdI9Bj3TGbSczW3Fyx2Odw21dp9Hy8aI
-      - JWT_ALGORITHM=HS256
-      - ACC_TOKEN_EXP_MIN=60
+      - DATABASE_URL=postgresql+asyncpg://admin:${POSTGRES_PASSWORD}@postgres:5432/users_db  # 👈 Исправь пароль
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - ACC_TOKEN_EXP_MIN=${ACC_TOKEN_EXP_MIN}
       - ORDERS_SERVICE_URL=http://service_orders:8000
-
     volumes:
-      - ./service_users:/app  # 👈 Оставляем как у тебя
+      - ./service_users:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - postgres
@@ -47,10 +45,10 @@ services:
   service_orders:
     build: ./service_orders
     environment:
-      - DATABASE_URL=postgresql+asyncpg://admin:password@postgres:5432/orders_db  # 👈 ДЛЯ DOCKER
+      - DATABASE_URL=postgresql+asyncpg://admin:${POSTGRES_PASSWORD}@postgres:5432/orders_db  # 👈 Исправь пароль
       - USERS_SERVICE_URL=http://service_users:8000
     volumes:
-      - ./service_orders:/app  # 👈 Оставляем как у тебя
+      - ./service_orders:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - postgres
