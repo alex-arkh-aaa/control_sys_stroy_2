@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мои заказы - Control System</title>
+    <title>Мои дефекты - Control System</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
@@ -101,12 +101,12 @@
     <div class="container">
         <div class="header">
             <div class="logo">
-                <h1>Мои заказы</h1>
-                <p>Управление строительными заказами</p>
+                <h1>Дефекты</h1>
+                <p>Управление строительными проектами</p>
             </div>
             <div class="page-actions">
                 <a href="/profile" class="btn btn-secondary">👤 Профиль</a>
-                <button onclick="openCreateOrderModal()" class="btn">➕ Создать заказ</button>
+                <button onclick="openCreateOrderModal()" class="btn">➕ Создать дефект</button>
             </div>
         </div>
 
@@ -115,13 +115,13 @@
 
         <div class="orders-container">
             <div class="section-header">
-                <h2 class="section-title">📦 История заказов</h2>
+                <h2 class="section-title">История дефектов</h2>
             </div>
             
             <!-- Поиск и фильтры -->
             <div class="search-filters">
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="🔍 Поиск по ID заказа (например: #63bfc240)" class="search-input">
+                    <input type="text" id="searchInput" placeholder="🔍 Поиск по ID дефекта (например: #63bfc240)" class="search-input">
                 </div>
                 <select id="statusFilter" class="filter-select">
                     <option value="">Все статусы</option>
@@ -142,7 +142,7 @@
             <!-- Контейнер со скроллом -->
             <div class="orders-scroll-container">
                 <div id="ordersList" class="orders-grid">
-                    <div class="loading">Загрузка заказов...</div>
+                    <div class="loading">Загрузка дефектов...</div>
                 </div>
             </div>
             
@@ -165,7 +165,7 @@
     <div id="createOrderModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>➕ Создать новый заказ</h2>
+                <h2>➕ Создать новый дефект</h2>
                 <button class="close-btn" onclick="closeModal()">×</button>
             </div>
             
@@ -185,7 +185,7 @@
 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-                    <button type="submit" class="btn">📦 Создать заказ</button>
+                    <button type="submit" class="btn">Создать дефект</button>
                 </div>
             </form>
         </div>
@@ -194,7 +194,7 @@
     <div id="editOrderModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>✏️ Редактировать заказ</h2>
+                <h2>✏️ Редактировать дефект</h2>
                 <button class="close-btn" onclick="closeEditModal()">×</button>
             </div>
             
@@ -202,12 +202,12 @@
                 <input type="hidden" id="editOrderId">
                 
                 <div class="form-group">
-                    <label>Статус заказа:</label>
+                    <label>Статус дефекта:</label>
                     <select id="editOrderStatus" class="status-select">
                         <option value="created">🆕 Создан</option>
                         <option value="in_progress">🔄 В работе</option>
                         <option value="completed">✅ Завершён</option>
-                        <option value="cancelled">❌ Отменён</option>
+                        <option value="cancelled">❌ Отклонен</option>
                     </select>
                 </div>
 
@@ -226,7 +226,7 @@
 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-danger" onclick="deleteOrder()" id="deleteOrderBtn">
-                        🗑️ Удалить заказ
+                        🗑️ Удалить дефект
                     </button>
                     <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Отмена</button>
                     <button type="submit" class="btn">💾 Сохранить изменения</button>
@@ -254,7 +254,7 @@
                     currentOrders = orders;
                     applyFiltersAndDisplay();
                 } else {
-                    showError('Ошибка загрузки заказов');
+                    showError('Ошибка загрузки дефектов');
                 }
             } catch (error) {
                 showError('Ошибка соединения с сервером');
@@ -315,10 +315,10 @@
             if (!orders || orders.length === 0) {
                 ordersList.innerHTML = `
                     <div class="no-orders">
-                        <h3>Заказов не найдено</h3>
-                        <p>Попробуйте изменить параметры поиска или создать новый заказ</p>
+                        <h3>Дефектов не найдено</h3>
+                        <p>Попробуйте изменить параметры поиска или создать новый дефект</p>
                         <button onclick="openCreateOrderModal()" class="btn" style="margin-top: 15px;">
-                            ➕ Создать первый заказ
+                            ➕ Создать первый дефект
                         </button>
                     </div>
                 `;
@@ -405,7 +405,7 @@
         function showLoading(show) {
             const ordersList = document.getElementById('ordersList');
             if (show) {
-                ordersList.innerHTML = '<div class="loading">Загрузка заказов...</div>';
+                ordersList.innerHTML = '<div class="loading">Загрузка дефектов...</div>';
             }
         }
 
@@ -558,22 +558,22 @@
                 if (response.ok) {
                     const newOrder = await response.json();
                     closeModal();
-                    showSuccess('Заказ успешно создан!');
+                    showSuccess('Дефект успешно создан!');
                     loadOrders();
                 } else {
                     const errorData = await response.json();
-                    showError('Ошибка при создании заказа: ' + (errorData.detail || 'Неизвестная ошибка'));
+                    showError('Ошибка при создании дефекта: ' + (errorData.detail || 'Неизвестная ошибка'));
                 }
             } catch (error) {
                 showError('Ошибка соединения с сервером: ' + error.message);
             }
         });
 
-        // Функции редактирования заказа
+        // Функции редактирования дефекта
         function openEditOrderModal(orderId) {
             const order = currentOrders.find(o => o.id === orderId);
             if (!order) {
-                showError('Заказ не найден');
+                showError('Дефект не найден');
                 return;
             }
 
@@ -643,7 +643,7 @@
             document.getElementById('editTotalAmount').value = total;
         }
 
-        // Обновление заказа
+        // Обновление дефекта
         document.getElementById('editOrderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -687,11 +687,11 @@
 
                 if (statusResponse.ok) {
                     closeEditModal();
-                    showSuccess('Заказ успешно обновлен!');
+                    showSuccess('Дефект успешно обновлен!');
                     loadOrders();
                 } else {
                     const errorData = await statusResponse.json();
-                    showError('Ошибка при обновлении заказа: ' + (errorData.detail || 'Неизвестная ошибка'));
+                    showError('Ошибка при обновлении дефекта: ' + (errorData.detail || 'Неизвестная ошибка'));
                 }
             } catch (error) {
                 showError('Ошибка соединения с сервером: ' + error.message);
@@ -712,7 +712,7 @@
                 });
 
                 if (response.ok) {
-                    showSuccess(`Статус заказа изменен на: ${getStatusDisplayName(newStatus)}`);
+                    showSuccess(`Статус дефекта изменен на: ${getStatusDisplayName(newStatus)}`);
                     loadOrders();
                 } else {
                     const errorData = await response.json();
@@ -723,11 +723,11 @@
             }
         }
 
-        // Удаление заказа
+        // Удаление дефекта
         async function deleteOrder() {
             const orderId = document.getElementById('editOrderId').value;
             
-            if (!confirm('Вы уверены, что хотите удалить этот заказ?')) {
+            if (!confirm('Вы уверены, что хотите удалить этот дефект?')) {
                 return;
             }
             
@@ -738,18 +738,18 @@
 
                 if (response.ok) {
                     closeEditModal();
-                    showSuccess('Заказ успешно удален!');
+                    showSuccess('Дефект успешно удален!');
                     loadOrders();
                 } else {
                     const errorData = await response.json();
-                    showError('Ошибка при удалении заказа: ' + (errorData.detail || 'Неизвестная ошибка'));
+                    showError('Ошибка при удалении дефекта: ' + (errorData.detail || 'Неизвестная ошибка'));
                 }
             } catch (error) {
                 showError('Ошибка соединения с сервером: ' + error.message);
             }
         }
 
-        // Загружаем заказы при загрузке страницы
+        // Загружаем дефекты при загрузке страницы
         loadOrders();
     </script>
 </body>
