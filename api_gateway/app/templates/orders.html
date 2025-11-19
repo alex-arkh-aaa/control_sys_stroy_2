@@ -32,7 +32,7 @@
         .search-input:focus { outline: none; border-color: #667eea; }
         .filter-select { padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 14px; min-width: 180px; }
         
-        /* Стили для скролла заказов */
+        /* Стили для скролла дефектов */
         .orders-scroll-container { max-height: 600px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #e1e5e9; border-radius: 10px; }
         .orders-grid { display: grid; gap: 15px; padding: 20px; }
         
@@ -45,12 +45,15 @@
         .status-in_progress { background: #fff3e0; color: #f57c00; }
         .status-completed { background: #e8f5e8; color: #2e7d32; }
         .status-cancelled { background: #ffebee; color: #c62828; }
-        .order-items { margin-bottom: 15px; }
-        .order-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e1e5e9; }
-        .item-name { color: #333; font-weight: 500; }
-        .item-quantity { color: #666; }
+        
+        .defect-info { margin-bottom: 15px; }
+        .defect-description { color: #333; font-weight: 500; margin-bottom: 8px; font-size: 16px; }
+        .defect-location { color: #666; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+        .defect-type { color: #666; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+        .defect-priority { color: #666; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+        .defect-responsible { color: #666; display: flex; align-items: center; gap: 5px; }
+        
         .order-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e1e5e9; }
-        .order-total { color: #333; font-size: 18px; font-weight: 600; }
         .order-date { color: #666; font-size: 14px; }
         .order-actions { display: flex; gap: 10px; margin-top: 15px; }
         
@@ -69,29 +72,30 @@
         
         /* Модальные окна */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; border-radius: 15px; padding: 30px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
+        .modal-content { background: white; border-radius: 15px; padding: 30px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e1e5e9; }
         .modal-header h2 { color: #333; font-size: 20px; margin: 0; }
         .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
         .close-btn:hover { color: #333; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
-        .order-item-input { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
-        .order-item-input input, .order-item-input select { flex: 1; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 14px; }
-        .order-item-input input:focus, .order-item-input select:focus { outline: none; border-color: #667eea; }
-        .remove-item { background: #dc3545; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .remove-item:hover { background: #c82333; }
-        .total-amount { background: #f8f9fa; font-weight: 600; font-size: 18px; color: #333; width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 14px; transition: all 0.3s ease; background: #f8f9fa; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #667eea; background: white; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e1e5e9; }
         .status-select { width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 14px; margin-bottom: 15px; }
         .success-message { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; }
+        
+        /* Приоритеты */
+        .priority-low { border-left-color: #28a745; }
+        .priority-medium { border-left-color: #ffc107; }
+        .priority-high { border-left-color: #fd7e14; }
+        .priority-critical { border-left-color: #dc3545; }
         
         @media (max-width: 768px) {
             .header { flex-direction: column; gap: 20px; text-align: center; }
             .page-actions { justify-content: center; }
             .search-filters { flex-direction: column; }
             .order-header, .order-footer { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .order-item-input { flex-direction: column; }
             .order-actions { flex-direction: column; }
             .pagination { flex-wrap: wrap; }
         }
@@ -121,7 +125,7 @@
             <!-- Поиск и фильтры -->
             <div class="search-filters">
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="🔍 Поиск по ID дефекта (например: #63bfc240)" class="search-input">
+                    <input type="text" id="searchInput" placeholder="🔍 Поиск по описанию или местоположению..." class="search-input">
                 </div>
                 <select id="statusFilter" class="filter-select">
                     <option value="">Все статусы</option>
@@ -130,11 +134,18 @@
                     <option value="completed">✅ Завершён</option>
                     <option value="cancelled">❌ Отменён</option>
                 </select>
+                <select id="priorityFilter" class="filter-select">
+                    <option value="">Все приоритеты</option>
+                    <option value="low">🟢 Низкий</option>
+                    <option value="medium">🟡 Средний</option>
+                    <option value="high">🔴 Высокий</option>
+                    <option value="critical">⚡ Критический</option>
+                </select>
                 <select id="sortSelect" class="filter-select">
                     <option value="newest">Сначала новые</option>
                     <option value="oldest">Сначала старые</option>
-                    <option value="total_high">Сумма по убыванию</option>
-                    <option value="total_low">Сумма по возрастанию</option>
+                    <option value="priority_high">По приоритету (высокий)</option>
+                    <option value="priority_low">По приоритету (низкий)</option>
                 </select>
                 <button onclick="clearFilters()" class="btn btn-outline">🗑️ Сбросить</button>
             </div>
@@ -161,7 +172,7 @@
         </div>
     </div>
 
-    <!-- Модальные окна (остаются без изменений) -->
+    <!-- Модальное окно создания дефекта -->
     <div id="createOrderModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -171,16 +182,41 @@
             
             <form id="createOrderForm">
                 <div class="form-group">
-                    <label>Товары в заказе:</label>
-                    <div id="orderItems"></div>
-                    <button type="button" class="btn btn-outline" onclick="addOrderItem()" style="margin-top: 10px;">
-                        ➕ Добавить товар
-                    </button>
+                    <label for="defectDescription">Описание дефекта *</label>
+                    <textarea id="defectDescription" name="defectDescription" placeholder="Подробное описание дефекта..." rows="3" required></textarea>
                 </div>
-                
+
                 <div class="form-group">
-                    <label>Общая сумма:</label>
-                    <input type="number" id="totalAmount" readonly class="total-amount" value="0">
+                    <label for="defectLocation">Местоположение *</label>
+                    <input type="text" id="defectLocation" name="defectLocation" placeholder="Объект, этаж, помещение..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="defectType">Тип дефекта *</label>
+                    <select id="defectType" name="defectType" required>
+                        <option value="">Выберите тип дефекта</option>
+                        <option value="structural">🏗️ Конструктивный</option>
+                        <option value="finishing">🎨 Отделочный</option>
+                        <option value="electrical">⚡ Электрический</option>
+                        <option value="plumbing">🚰 Сантехнический</option>
+                        <option value="other">❓ Другой</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="defectPriority">Приоритет *</label>
+                    <select id="defectPriority" name="defectPriority" required>
+                        <option value="">Выберите приоритет</option>
+                        <option value="low">🟢 Низкий</option>
+                        <option value="medium">🟡 Средний</option>
+                        <option value="high">🔴 Высокий</option>
+                        <option value="critical">⚡ Критический</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="defectResponsible">Ответственный *</label>
+                    <input type="text" id="defectResponsible" name="defectResponsible" placeholder="ФИО ответственного..." required>
                 </div>
 
                 <div class="modal-actions">
@@ -191,6 +227,7 @@
         </div>
     </div>
 
+    <!-- Модальное окно редактирования дефекта -->
     <div id="editOrderModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -212,16 +249,39 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Товары в заказе:</label>
-                    <div id="editOrderItems"></div>
-                    <button type="button" class="btn btn-outline" onclick="addEditOrderItem()" style="margin-top: 10px;">
-                        ➕ Добавить товар
-                    </button>
+                    <label for="editDefectDescription">Описание дефекта</label>
+                    <textarea id="editDefectDescription" name="defectDescription" placeholder="Подробное описание дефекта..." rows="3" required></textarea>
                 </div>
-                
+
                 <div class="form-group">
-                    <label>Общая сумма:</label>
-                    <input type="number" id="editTotalAmount" readonly class="total-amount" value="0">
+                    <label for="editDefectLocation">Местоположение</label>
+                    <input type="text" id="editDefectLocation" name="defectLocation" placeholder="Объект, этаж, помещение..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDefectType">Тип дефекта</label>
+                    <select id="editDefectType" name="defectType" required>
+                        <option value="structural">🏗️ Конструктивный</option>
+                        <option value="finishing">🎨 Отделочный</option>
+                        <option value="electrical">⚡ Электрический</option>
+                        <option value="plumbing">🚰 Сантехнический</option>
+                        <option value="other">❓ Другой</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDefectPriority">Приоритет</label>
+                    <select id="editDefectPriority" name="defectPriority" required>
+                        <option value="low">🟢 Низкий</option>
+                        <option value="medium">🟡 Средний</option>
+                        <option value="high">🔴 Высокий</option>
+                        <option value="critical">⚡ Критический</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDefectResponsible">Ответственный</label>
+                    <input type="text" id="editDefectResponsible" name="defectResponsible" placeholder="ФИО ответственного..." required>
                 </div>
 
                 <div class="modal-actions">
@@ -242,9 +302,10 @@
         let totalPages = 1;
         let searchTerm = '';
         let statusFilter = '';
+        let priorityFilter = '';
         let sortBy = 'newest';
 
-        // Загрузка заказов
+        // Загрузка дефектов
         async function loadOrders() {
             try {
                 showLoading(true);
@@ -266,11 +327,13 @@
         function applyFiltersAndDisplay() {
             let filteredOrders = [...currentOrders];
             
-            // Применяем поиск по ID
+            // Применяем поиск по описанию и местоположению
             if (searchTerm) {
-                const searchTermClean = searchTerm.replace('#', '').toLowerCase();
+                const searchTermClean = searchTerm.toLowerCase();
                 filteredOrders = filteredOrders.filter(order => 
-                    order.id.toLowerCase().includes(searchTermClean)
+                    (order.defect_description && order.defect_description.toLowerCase().includes(searchTermClean)) ||
+                    (order.defect_location && order.defect_location.toLowerCase().includes(searchTermClean)) ||
+                    (order.responsible_person && order.responsible_person.toLowerCase().includes(searchTermClean))
                 );
             }
             
@@ -281,15 +344,22 @@
                 );
             }
             
+            // Применяем фильтр по приоритету
+            if (priorityFilter) {
+                filteredOrders = filteredOrders.filter(order => 
+                    order.defect_priority === priorityFilter
+                );
+            }
+            
             // Применяем сортировку
             filteredOrders.sort((a, b) => {
                 switch (sortBy) {
                     case 'oldest':
                         return new Date(a.created_at) - new Date(b.created_at);
-                    case 'total_high':
-                        return (b.total_amount || 0) - (a.total_amount || 0);
-                    case 'total_low':
-                        return (a.total_amount || 0) - (b.total_amount || 0);
+                    case 'priority_high':
+                        return getPriorityWeight(b.defect_priority) - getPriorityWeight(a.defect_priority);
+                    case 'priority_low':
+                        return getPriorityWeight(a.defect_priority) - getPriorityWeight(b.defect_priority);
                     case 'newest':
                     default:
                         return new Date(b.created_at) - new Date(a.created_at);
@@ -300,7 +370,7 @@
             totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
             if (currentPage > totalPages) currentPage = 1;
             
-            // Получаем заказы для текущей страницы
+            // Получаем дефекты для текущей страницы
             const startIndex = (currentPage - 1) * ordersPerPage;
             const endIndex = startIndex + ordersPerPage;
             const ordersToDisplay = filteredOrders.slice(startIndex, endIndex);
@@ -326,7 +396,7 @@
             }
 
             ordersList.innerHTML = orders.map(order => `
-                <div class="order-card">
+                <div class="order-card priority-${order.defect_priority || 'medium'}">
                     <div class="order-header">
                         <div class="order-id">#${order.id?.slice(0, 8) || 'N/A'}</div>
                         <div class="order-status status-${order.status || 'created'}">
@@ -334,17 +404,15 @@
                         </div>
                     </div>
                     
-                    <div class="order-items">
-                        ${(order.items || []).map(item => `
-                            <div class="order-item">
-                                <span class="item-name">${item.product || 'Неизвестный товар'}</span>
-                                <span class="item-quantity">${item.quantity || 0} шт. × ${item.price || 0} ₽</span>
-                            </div>
-                        `).join('')}
+                    <div class="defect-info">
+                        <div class="defect-description">${order.defect_description || 'Описание отсутствует'}</div>
+                        <div class="defect-location">📍 ${order.defect_location || 'Местоположение не указано'}</div>
+                        <div class="defect-type">📋 ${getDefectTypeDisplayName(order.defect_type)}</div>
+                        <div class="defect-priority">🚨 ${getPriorityDisplayName(order.defect_priority)}</div>
+                        <div class="defect-responsible">👤 ${order.responsible_person || 'Ответственный не назначен'}</div>
                     </div>
                     
                     <div class="order-footer">
-                        <div class="order-total">${order.total_amount || 0} ₽</div>
                         <div class="order-date">
                             ${order.created_at ? new Date(order.created_at).toLocaleDateString('ru-RU') : 'Дата не указана'}
                         </div>
@@ -398,7 +466,7 @@
             if (page < 1 || page > totalPages) return;
             currentPage = page;
             applyFiltersAndDisplay();
-            // Прокручиваем к верху списка заказов
+            // Прокручиваем к верху списка дефектов
             document.querySelector('.orders-scroll-container').scrollTop = 0;
         }
 
@@ -409,6 +477,7 @@
             }
         }
 
+        // Вспомогательные функции для отображения
         function getStatusDisplayName(status) {
             const statuses = {
                 'created': 'Создан',
@@ -417,6 +486,37 @@
                 'cancelled': 'Отменён'
             };
             return statuses[status] || status || 'Создан';
+        }
+
+        function getDefectTypeDisplayName(type) {
+            const types = {
+                'structural': 'Конструктивный',
+                'finishing': 'Отделочный',
+                'electrical': 'Электрический',
+                'plumbing': 'Сантехнический',
+                'other': 'Другой'
+            };
+            return types[type] || type || 'Не указан';
+        }
+
+        function getPriorityDisplayName(priority) {
+            const priorities = {
+                'low': 'Низкий',
+                'medium': 'Средний',
+                'high': 'Высокий',
+                'critical': 'Критический'
+            };
+            return `Приоритет: ${priorities[priority] || priority || 'Не указан'}`;
+        }
+
+        function getPriorityWeight(priority) {
+            const weights = {
+                'low': 1,
+                'medium': 2,
+                'high': 3,
+                'critical': 4
+            };
+            return weights[priority] || 0;
         }
 
         function showError(message) {
@@ -446,6 +546,12 @@
             applyFiltersAndDisplay();
         });
 
+        document.getElementById('priorityFilter').addEventListener('change', function(e) {
+            priorityFilter = e.target.value;
+            currentPage = 1;
+            applyFiltersAndDisplay();
+        });
+
         document.getElementById('sortSelect').addEventListener('change', function(e) {
             sortBy = e.target.value;
             currentPage = 1;
@@ -455,93 +561,39 @@
         function clearFilters() {
             document.getElementById('searchInput').value = '';
             document.getElementById('statusFilter').value = '';
+            document.getElementById('priorityFilter').value = '';
             document.getElementById('sortSelect').value = 'newest';
             searchTerm = '';
             statusFilter = '';
+            priorityFilter = '';
             sortBy = 'newest';
             currentPage = 1;
             applyFiltersAndDisplay();
         }
 
-        // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (создание, редактирование заказов) ==========
-        // ... (все остальные функции из предыдущего кода остаются без изменений)
+        // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ДЕФЕКТАМИ ==========
+
         function openCreateOrderModal() {
             document.getElementById('createOrderModal').style.display = 'flex';
-            addOrderItem();
         }
 
         function closeModal() {
             document.getElementById('createOrderModal').style.display = 'none';
             document.getElementById('createOrderForm').reset();
-            document.getElementById('orderItems').innerHTML = '';
-            document.getElementById('totalAmount').value = '0';
         }
 
-        function addOrderItem() {
-            const orderItems = document.getElementById('orderItems');
-            const itemId = Date.now();
-            
-            const itemHtml = `
-                <div class="order-item-input" id="item-${itemId}">
-                    <input type="text" placeholder="Название товара" class="item-product" oninput="calculateTotal()" required>
-                    <input type="number" placeholder="Кол-во" class="item-quantity" min="1" value="1" oninput="calculateTotal()" required>
-                    <input type="number" placeholder="Цена за шт." class="item-price" min="0" value="0" oninput="calculateTotal()" required>
-                    <button type="button" class="remove-item" onclick="removeOrderItem('${itemId}')">×</button>
-                </div>
-            `;
-            
-            orderItems.insertAdjacentHTML('beforeend', itemHtml);
-            calculateTotal();
-        }
-
-        function removeOrderItem(itemId) {
-            const itemElement = document.getElementById('item-' + itemId);
-            if (itemElement) {
-                itemElement.remove();
-                calculateTotal();
-            }
-        }
-
-        function calculateTotal() {
-            const items = document.querySelectorAll('.order-item-input');
-            let total = 0;
-            
-            items.forEach(item => {
-                const quantity = parseInt(item.querySelector('.item-quantity').value) || 0;
-                const price = parseInt(item.querySelector('.item-price').value) || 0;
-                total += quantity * price;
-            });
-            
-            document.getElementById('totalAmount').value = total;
-        }
-
-        // Создание заказа
+        // Создание дефекта
         document.getElementById('createOrderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const items = [];
-            const itemElements = document.querySelectorAll('.order-item-input');
-            
-            itemElements.forEach(item => {
-                const product = item.querySelector('.item-product').value.trim();
-                const quantity = parseInt(item.querySelector('.item-quantity').value);
-                const price = parseInt(item.querySelector('.item-price').value);
-                
-                if (product && quantity > 0 && price >= 0) {
-                    items.push({ 
-                        product: product,
-                        quantity: quantity,
-                        price: price 
-                    });
-                }
-            });
-            
-            if (items.length === 0) {
-                showError('Добавьте хотя бы один товар');
-                return;
-            }
-            
-            const totalAmount = parseInt(document.getElementById('totalAmount').value);
+            const defectData = {
+                defect_description: document.getElementById('defectDescription').value,
+                defect_location: document.getElementById('defectLocation').value,
+                defect_type: document.getElementById('defectType').value,
+                defect_priority: document.getElementById('defectPriority').value,
+                responsible_person: document.getElementById('defectResponsible').value,
+                severity_level: getPriorityWeight(document.getElementById('defectPriority').value)
+            };
             
             try {
                 const response = await fetch('/api/v1/orders/', {
@@ -549,10 +601,7 @@
                     headers: { 
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ 
-                        items: items, 
-                        total_amount: totalAmount 
-                    })
+                    body: JSON.stringify(defectData)
                 });
 
                 if (response.ok) {
@@ -579,68 +628,18 @@
 
             document.getElementById('editOrderId').value = orderId;
             document.getElementById('editOrderStatus').value = order.status;
+            document.getElementById('editDefectDescription').value = order.defect_description || '';
+            document.getElementById('editDefectLocation').value = order.defect_location || '';
+            document.getElementById('editDefectType').value = order.defect_type || 'other';
+            document.getElementById('editDefectPriority').value = order.defect_priority || 'medium';
+            document.getElementById('editDefectResponsible').value = order.responsible_person || '';
             
-            const editOrderItems = document.getElementById('editOrderItems');
-            editOrderItems.innerHTML = '';
-            
-            if (order.items && order.items.length > 0) {
-                order.items.forEach((item, index) => {
-                    addEditOrderItem(item.product, item.quantity, item.price);
-                });
-            } else {
-                addEditOrderItem();
-            }
-            
-            document.getElementById('editTotalAmount').value = order.total_amount || 0;
             document.getElementById('editOrderModal').style.display = 'flex';
         }
 
         function closeEditModal() {
             document.getElementById('editOrderModal').style.display = 'none';
             document.getElementById('editOrderForm').reset();
-            document.getElementById('editOrderItems').innerHTML = '';
-            document.getElementById('editTotalAmount').value = '0';
-        }
-
-        function addEditOrderItem(product = '', quantity = 1, price = 0) {
-            const editOrderItems = document.getElementById('editOrderItems');
-            const itemId = Date.now();
-            
-            const itemHtml = `
-                <div class="order-item-input" id="edit-item-${itemId}">
-                    <input type="text" placeholder="Название товара" class="item-product" 
-                           value="${product}" oninput="calculateEditTotal()" required>
-                    <input type="number" placeholder="Кол-во" class="item-quantity" min="1" 
-                           value="${quantity}" oninput="calculateEditTotal()" required>
-                    <input type="number" placeholder="Цена за шт." class="item-price" min="0" 
-                           value="${price}" oninput="calculateEditTotal()" required>
-                    <button type="button" class="remove-item" onclick="removeEditOrderItem('${itemId}')">×</button>
-                </div>
-            `;
-            
-            editOrderItems.insertAdjacentHTML('beforeend', itemHtml);
-            calculateEditTotal();
-        }
-
-        function removeEditOrderItem(itemId) {
-            const itemElement = document.getElementById('edit-item-' + itemId);
-            if (itemElement) {
-                itemElement.remove();
-                calculateEditTotal();
-            }
-        }
-
-        function calculateEditTotal() {
-            const items = document.querySelectorAll('#editOrderItems .order-item-input');
-            let total = 0;
-            
-            items.forEach(item => {
-                const quantity = parseInt(item.querySelector('.item-quantity').value) || 0;
-                const price = parseInt(item.querySelector('.item-price').value) || 0;
-                total += quantity * price;
-            });
-            
-            document.getElementById('editTotalAmount').value = total;
         }
 
         // Обновление дефекта
@@ -649,30 +648,6 @@
             
             const orderId = document.getElementById('editOrderId').value;
             const newStatus = document.getElementById('editOrderStatus').value;
-            
-            const items = [];
-            const itemElements = document.querySelectorAll('#editOrderItems .order-item-input');
-            
-            itemElements.forEach(item => {
-                const product = item.querySelector('.item-product').value.trim();
-                const quantity = parseInt(item.querySelector('.item-quantity').value);
-                const price = parseInt(item.querySelector('.item-price').value);
-                
-                if (product && quantity > 0 && price >= 0) {
-                    items.push({ 
-                        product: product,
-                        quantity: quantity,
-                        price: price 
-                    });
-                }
-            });
-            
-            if (items.length === 0) {
-                showError('Добавьте хотя бы один товар');
-                return;
-            }
-            
-            const totalAmount = parseInt(document.getElementById('editTotalAmount').value);
             
             try {
                 const statusResponse = await fetch(`/api/v1/orders/${orderId}`, {

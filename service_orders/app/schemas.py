@@ -3,21 +3,26 @@ from uuid import UUID
 from datetime import datetime
 from typing import List, Dict
 
-class OrderItem(BaseModel):
-    product: str
-    quantity: int
-    price: int  # цена за единицу
+# УДАЛЯЕМ старый OrderItem и создаем новые схемы для дефектов
 
 class OrderCreate(BaseModel):
-    items: List[OrderItem]
-    total_amount: int
+    defect_description: str
+    defect_location: str
+    defect_type: str
+    defect_priority: str
+    responsible_person: str
+    severity_level: int = 1
 
 class OrderResponse(BaseModel):
     id: UUID
     user_id: UUID
-    items: List[Dict]
+    defect_description: str
+    defect_location: str
+    defect_type: str
+    defect_priority: str
+    responsible_person: str
+    severity_level: int
     status: str
-    total_amount: int
     created_at: datetime
     updated_at: datetime
 

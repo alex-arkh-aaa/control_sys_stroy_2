@@ -181,7 +181,6 @@ async def proxy_request(service: str, request: Request, path: str):
                 status_code=response.status_code,
                 headers=dict(response.headers)
             )
-            
     except httpx.ConnectError:
         logger.error(f"❌ Cannot connect to {service} service")
         raise HTTPException(status_code=503, detail=f"Service {service} unavailable")

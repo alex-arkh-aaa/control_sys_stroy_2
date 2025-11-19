@@ -2,8 +2,17 @@ from sqlalchemy import UUID, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from .models import Orders
 
-async def create_order(db: AsyncSession, user_id: UUID, items: list, total_amount: int):
-    order = Orders(user_id=user_id, items=items, total_amount=total_amount, status="created")
+async def create_order(db: AsyncSession, user_id: UUID, defect_data: dict):
+    order = Orders(
+        user_id=user_id,
+        defect_description=defect_data['defect_description'],
+        defect_location=defect_data['defect_location'],
+        defect_type=defect_data['defect_type'],
+        defect_priority=defect_data['defect_priority'],
+        responsible_person=defect_data['responsible_person'],
+        severity_level=defect_data.get('severity_level', 1),
+        status="created"
+    )
     db.add(order)
     await db.commit()
     await db.refresh(order)
