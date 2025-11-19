@@ -33,7 +33,7 @@ templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/health")
 async def health():
-    return {'message': 'service_orders successfully working!'}
+    return {'message': 'defects_orders successfully working!'}
 
 
 
@@ -42,10 +42,10 @@ async def health():
 async def get_orders(
     skip: int = 0,
     limit: int = 100,
-    x_user_id: str = Header(...),  # 👈 user_id из API Gateway
+    x_user_id: str = Header(...),
     db: AsyncSession = Depends(get_db)
 ):
-    """Получить заказы текущего пользователя"""
+    """Получить дефекты текущего пользователя"""
     user_id = UUID(x_user_id)
     orders = await crud.get_user_orders(db, user_id, skip=skip, limit=limit)
     return orders
@@ -53,33 +53,31 @@ async def get_orders(
 @router.post("/", response_model=OrderResponse)
 async def create_order(
     order_data: OrderCreate,
-    x_user_id: str = Header(...),  # 👈 user_id из API Gateway
+    x_user_id: str = Header(...),
     db: AsyncSession = Depends(get_db)
 ):
-    """Создать новый заказ"""
+    """Создать новый дефект"""
     user_id = UUID(x_user_id)
     order = await crud.create_order(
         db, 
         user_id=user_id,
-        items=[item.dict() for item in order_data.items],
-        total_amount=order_data.total_amount
+        defect_data=order_data.dict()
     )
     return order
 
 @router.get("/{order_id}", response_model=OrderResponse)
 async def get_order(
     order_id: UUID,
-    x_user_id: str = Header(...),  # 👈 user_id из API Gateway
+    x_user_id: str = Header(...),
     db: AsyncSession = Depends(get_db)
 ):
-    """Получить заказ по ID"""
+    """Получить дефект по ID"""
     user_id = UUID(x_user_id)
     order = await crud.get_order(db, order_id)
     
     if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail="Defect not found")
     
-    # Проверяем что заказ принадлежит пользователю
     if order.user_id != user_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
@@ -89,15 +87,15 @@ async def get_order(
 async def update_order(
     order_id: UUID,
     order_update: OrderUpdate,
-    x_user_id: str = Header(...),  # 👈 user_id из API Gateway
+    x_user_id: str = Header(...),
     db: AsyncSession = Depends(get_db)
 ):
-    """Обновить статус заказа"""
+    """Обновить статус дефекта"""
     user_id = UUID(x_user_id)
     order = await crud.get_order(db, order_id)
     
     if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail="Defect not found")
     
     if order.user_id != user_id:
         raise HTTPException(status_code=403, detail="Access denied")
@@ -105,24 +103,25 @@ async def update_order(
     updated_order = await crud.update_order_status(db, order_id, order_update.status)
     return updated_order
 
+
 @router.delete("/{order_id}")
 async def delete_order(
     order_id: UUID,
-    x_user_id: str = Header(...),  # 👈 user_id из API Gateway
+    x_user_id: str = Header(...),
     db: AsyncSession = Depends(get_db)
 ):
-    """Удалить заказ"""
+    """Удалить дефект"""
     user_id = UUID(x_user_id)
     order = await crud.get_order(db, order_id)
     
     if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+        raise HTTPException(status_code=404, detail="Defect not found")
     
     if order.user_id != user_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
     await crud.delete_order(db, order_id)
-    return {"message": "Order deleted"}
+    return {"message": "Defect deleted"}
 
 
 
