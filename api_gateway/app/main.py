@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .rate_limiting import rate_limit_middleware
 
 
+
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="API Gateway")
