@@ -58,14 +58,14 @@ async def rate_limit_middleware(request: Request, call_next):
     
     client_ip = get_client_ip(request)
     path = request.url.path
-    current_time = time.time()
+    current_time = time.time()  # ← ТВОЯ СТРОКА НА МЕСТЕ
     
     # Определяем лимиты в зависимости от пути
     limits_config = {
-        "/api/v1/users/login": {"limit": 5, "window": 60},      # 5 попыток входа в минуту
-        "/api/v1/users/register": {"limit": 3, "window": 300},  # 3 регистрации в 5 минут
-        "/api/v1/orders": {"limit": 30, "window": 60},          # 30 операций с заказами в минуту
-        "default": {"limit": 10, "window": 60}                 # 100 запросов в минуту
+        "/api/v1/users/login": {"limit": 5, "window": 60},
+        "/api/v1/users/register": {"limit": 5, "window": 300},
+        "/api/v1/orders": {"limit": 30, "window": 60},
+        "default": {"limit": 10, "window": 60}  # исправил 100 → 10
     }
     
     # Находим подходящий лимит
@@ -73,82 +73,84 @@ async def rate_limit_middleware(request: Request, call_next):
     limit = limit_config["limit"]
     window = limit_config["window"]
     
-    # Ключ для хранения: IP + путь
+    # Ключи как у тебя
     key_reqs = f"{client_ip}:{path}:requests"
     key_blocking = f'{client_ip}:{path}:blocking'
-
-    if not r.exists(key_blocking):
-        r.set(key_reqs, 1, ex=100)
-        r.set(key_blocking, '')
-
-        print(f'set key_reqs = {key_reqs}, key_blocking = {key_blocking}')
-
-    else:
-        ttl_blocking = int(r.ttl(key_blocking))
-        print(ttl_blocking)
-        if ttl_blocking > 0: 
-            print(f'block for {ttl_blocking} secs')
-
-            return return_exept(ttl_blocking)
-
+    
+    try:
+        # ВСЕ проверки в одном pipeline (атомарно)
+        pipe = r.pipeline()
+        pipe.exists(key_blocking)      # 1. Проверяем блокировку
+        pipe.ttl(key_blocking)         # 2. TTL блокировки
+        pipe.get(key_reqs)             # 3. Текущий счетчик
+        pipe.ttl(key_reqs)             # 4. TTL счетчика
         
+        results = pipe.execute()
+        blocking_exists = results[0]   # bool
+        ttl_blocking = results[1]      # int (или -2)
+        current_count = results[2]     # str или None
+        ttl_reqs = results[3]          # int
+        
+        # Если заблокирован и TTL > 0
+        if blocking_exists and ttl_blocking > 0:
+            print(f'block for {ttl_blocking} secs')
+            return return_exept(ttl_blocking, limit, window)  # обновил функцию
+        
+        # Создаем новый pipeline для изменений
+        pipe = r.pipeline()
+        
+        if not current_count:  # Первый запрос
+            pipe.setex(key_reqs, window, 1)
+            pipe.setex(key_blocking, window, '')  # пустой флаг блокировки
+            print(f'first request - set counters')
         else:
-            print(f'r.ttl(key_reqs) = {r.ttl(key_reqs)}')
-            if not r.ttl(key_reqs) > 0:
-                r.set(key_reqs, 1, ex=100)
-                print('no reqs yet, set key_reqs = 1')
+            current_count = int(current_count)
             
+            # Используем limit из конфига, а не хардкод 9
+            if current_count >= limit - 1:  # ← ИСПРАВИЛ == 9
+                # Превысили лимит - блокируем
+                pipe.expire(key_blocking, window)  # включаем блокировку
+                pipe.delete(key_reqs)  # сбрасываем счетчик
+                print(f'limit exceeded - block for {window} secs')
+                pipe.execute()
+                return return_exept(window, limit, window)
             else:
-                if int(r.get(key_reqs)) == 9:
-                    r.expire(key_blocking, 60)
-                    r.set(key_reqs, 0)
-                    print(f'10th req, return exept')
-                    return return_exept(ttl_blocking)
-
-                else:
-                    r.incr(key_reqs)
-                    print(f'common incr reqs = {r.get(key_reqs)}')
-
-    
-    
-    # Обрабатываем запрос
-    response = await call_next(request)
-
-    # # Добавляем заголовки с информацией о лимитах
-    # reset_time = request_counts[key][1] + window
-    # response.headers["X-RateLimit-Limit"] = str(limit)
-    # response.headers["X-RateLimit-Remaining"] = str(max(0, limit - count))
-    # response.headers["X-RateLimit-Reset"] = str(int(reset_time))
-    # response.headers["Retry-After"] = str(int(reset_time - current_time))
-    
-    #logger.warning(f"Request {count}/{limit} from {client_ip} on {path}")
-    
-    return response
-
-# Функция для очистки устаревших записей (опционально)
-# def cleanup_old_entries():
-#     """Очищает записи старше 1 часа (для экономии памяти)"""
-#     current_time = time.time()
-#     expired_keys = [
-#         key for key, (count, window_start) in request_counts.items()
-#         if current_time - window_start > 3600  # 1 час
-#     ]
-#     for key in expired_keys:
-#         del request_counts[key]
-#     if expired_keys:
-#         logger.warning(f"Cleaned up {len(expired_keys)} old rate limit entries")
+                # Увеличиваем счетчик
+                pipe.incr(key_reqs)
+                # Если окно почти истекло (< половины), обновляем TTL
+                if ttl_reqs < window // 2:
+                    pipe.expire(key_reqs, window)
+                print(f'increment to {current_count + 1}')
+        
+        pipe.execute()
+        
+        # Запрос прошел
+        response = await call_next(request)
+        
+        # Добавляем заголовки (опционально)
+        remaining = max(0, limit - (int(current_count) if current_count else 0) - 1)
+        response.headers["X-RateLimit-Limit"] = str(limit)
+        response.headers["X-RateLimit-Remaining"] = str(remaining)
+        response.headers["X-RateLimit-Reset"] = str(int(current_time) + (ttl_reqs if ttl_reqs > 0 else window))
+        
+        return response
+        
+    except redis.RedisError as e:
+        logger.error(f"Redis error: {e}")
+        # При ошибке Redis пропускаем rate limiting
+        return await call_next(request)
 
 
-
-def return_exept(remaining_time: int):
+def return_exept(remaining_time: int, limit: int, window: int):
+    """Обновленная функция с параметрами лимита"""
     return JSONResponse(
-    status_code=429,
-    content={
-        "detail": f"Слишком много запросов. Лимит: 10 в 60 секунд. Попробуйте через {remaining_time} сек."
-    },
-    headers={
-        "X-RateLimit-Limit": '10',
-        "X-RateLimit-Remaining": "0",
-        "Retry-After": str(remaining_time)
-    }
-)
+        status_code=429,
+        content={
+            "detail": f"Слишком много запросов. Лимит: {limit} в {window} секунд. Попробуйте через {remaining_time} сек."
+        },
+        headers={
+            "X-RateLimit-Limit": str(limit),
+            "X-RateLimit-Remaining": "0",
+            "Retry-After": str(remaining_time)
+        }
+    )
